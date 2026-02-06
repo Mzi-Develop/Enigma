@@ -1,0 +1,34 @@
+{
+    "version": "Enigma I",
+    "rotors": [
+        "II",
+        "III",
+        "IV"
+    ],
+    "reflector": "UKW-B",
+    "plugboard": {
+        "D": "O",
+        "O": "D",
+        "R": "E",
+        "E": "R",
+        "M": "I",
+        "I": "M",
+        "F": "A",
+        "A": "F"
+    },
+    "rotorPositions": [
+        10,
+        8,
+        19
+    ],
+    "initialRotorPositions": [
+        1,
+        7,
+        19
+    ],
+    "lastEncryptionPositions": [
+        1,
+        7,
+        19
+    ]
+}

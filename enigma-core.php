@@ -7,6 +7,7 @@ class EnigmaMachine {
     private $plugboard = [];
     private $rotorPositions = [];
     private $initialRotorPositions = [];
+    private $lastEncryptionPositions = [];
     
     private $versions = [
         'Enigma I' => [
@@ -76,7 +77,8 @@ class EnigmaMachine {
             'reflector' => $this->reflector,
             'plugboard' => $this->plugboard,
             'rotorPositions' => $this->rotorPositions,
-            'initialRotorPositions' => $this->initialRotorPositions
+            'initialRotorPositions' => $this->initialRotorPositions,
+            'lastEncryptionPositions' => $this->lastEncryptionPositions 
         ];
         
         file_put_contents($this->settingsFile, json_encode($settings, JSON_PRETTY_PRINT));
@@ -95,6 +97,7 @@ class EnigmaMachine {
                     $this->plugboard = $settings['plugboard'];
                     $this->rotorPositions = $settings['rotorPositions'];
                     $this->initialRotorPositions = $settings['initialRotorPositions'];
+                    $this->lastEncryptionPositions = isset($settings['lastEncryptionPositions']) ? $settings['lastEncryptionPositions'] : $settings['initialRotorPositions'];
                 }
             } catch (Exception $e) {
                 $this->reset();
@@ -135,6 +138,7 @@ class EnigmaMachine {
         }
         
         $this->initialRotorPositions = $this->rotorPositions;
+        $this->lastEncryptionPositions = $this->rotorPositions;
         
         $this->reflector = $config['reflectors'][0];
         
@@ -145,8 +149,16 @@ class EnigmaMachine {
         $this->rotorPositions = $this->initialRotorPositions;
     }
     
+    public function resetToLastEncryptionPositions() {
+        $this->rotorPositions = $this->lastEncryptionPositions;
+    }
+    
     public function saveCurrentPositionsAsInitial() {
         $this->initialRotorPositions = $this->rotorPositions;
+    }
+    
+    public function saveCurrentPositionsAsLastEncryption() {
+        $this->lastEncryptionPositions = $this->rotorPositions;
     }
     
     public function setRotors($rotors, $positions = null) {
@@ -171,9 +183,11 @@ class EnigmaMachine {
             }
             $this->rotorPositions = $positions;
             $this->initialRotorPositions = $positions;
+            $this->lastEncryptionPositions = $positions;
         } else {
             $this->rotorPositions = array_fill(0, count($rotors), 0);
             $this->initialRotorPositions = $this->rotorPositions;
+            $this->lastEncryptionPositions = $this->rotorPositions;
         }
     }
     
@@ -184,6 +198,7 @@ class EnigmaMachine {
         }
         $this->rotorPositions = $positions;
         $this->initialRotorPositions = $positions;
+        $this->lastEncryptionPositions = $positions;
     }
     
     public function setReflector($reflector) {
@@ -224,16 +239,24 @@ class EnigmaMachine {
         $result = '';
         $text = preg_replace('/[^A-Za-z]/', '', strtoupper($text));
         
+        $this->lastEncryptionPositions = $this->rotorPositions;
+        
         for ($i = 0; $i < strlen($text); $i++) {
             $char = $text[$i];
             $result .= $this->processChar($char);
         }
         
+        $this->saveSettings();
         return $result;
     }
     
     public function decrypt($text) {
-        $this->resetToInitialPositions();
+        $this->rotorPositions = $this->lastEncryptionPositions;
+        return $this->encrypt($text);
+    }
+    
+    public function decryptWithInitialPositions($text) {
+        $this->rotorPositions = $this->initialRotorPositions;
         return $this->encrypt($text);
     }
     
@@ -315,6 +338,11 @@ class EnigmaMachine {
             $initialPositionsStr .= chr(65 + $pos) . ' ';
         }
         
+        $lastEncryptionPositionsStr = '';
+        foreach ($this->lastEncryptionPositions as $pos) {
+            $lastEncryptionPositionsStr .= chr(65 + $pos) . ' ';
+        }
+        
         $plugboardStr = '';
         $used = [];
         foreach ($this->plugboard as $a => $b) {
@@ -331,6 +359,7 @@ class EnigmaMachine {
             'Роторы' => implode(' | ', $this->rotors),
             'Текущие позиции' => trim($rotorPositionsStr),
             'Начальные позиции' => trim($initialPositionsStr),
+            'Позиции последнего шифрования' => trim($lastEncryptionPositionsStr),
             'Рефлектор' => $this->reflector,
             'Коммутационная панель' => $plugboardStr ?: 'Нет соединений'
         ];
@@ -347,6 +376,14 @@ class EnigmaMachine {
     public function getInitialRotorPositions() {
         $positions = [];
         foreach ($this->initialRotorPositions as $pos) {
+            $positions[] = chr(65 + $pos);
+        }
+        return implode(' ', $positions);
+    }
+    
+    public function getLastEncryptionPositions() {
+        $positions = [];
+        foreach ($this->lastEncryptionPositions as $pos) {
             $positions[] = chr(65 + $pos);
         }
         return implode(' ', $positions);

@@ -187,84 +187,103 @@ class EnigmaMenu {
         fgets(STDIN);
     }
     
-    public function processText() {
-        system('cls');
-        echo "==================================================\n";
-        echo "          ШИФРОВАНИЕ / ДЕШИФРОВАНИЕ\n";
-        echo "==================================================\n\n";
+public function processText() {
+    system('cls');
+    echo "==================================================\n";
+    echo "          ШИФРОВАНИЕ / ДЕШИФРОВАНИЕ\n";
+    echo "==================================================\n\n";
+    
+    echo "Текущие позиции роторов: " . $this->enigma->getRotorPositions() . "\n";
+    echo "Начальные позиции роторов: " . $this->enigma->getInitialRotorPositions() . "\n";
+    echo "Позиции последнего шифрования: " . $this->enigma->getLastEncryptionPositions() . "\n\n";
+    
+    echo "Введите текст для обработки (только буквы A-Z):\n";
+    $text = trim(fgets(STDIN));
+    
+    if (empty($text)) {
+        echo "Текст не может быть пустым!\n";
+        echo "\nНажмите Enter для продолжения...";
+        fgets(STDIN);
+        return;
+    }
+    
+    echo "\nВыберите действие:\n";
+    echo "1. Зашифровать - использовать текущие позиции\n";
+    echo "2. Зашифровать - использовать начальные позиции\n";
+    echo "3. Расшифровать использовать позиции последнего шифрования\n";
+    echo "4. Расшифровать - использовать начальные позиции\n";
+    echo "5. Установить - текущие позиции как начальные\n";
+    echo "6. Установить - текущие позиции как позиции шифрования\n";
+    echo "Выбор (1-6): ";
+    
+    $choice = intval(trim(fgets(STDIN)));
+    
+    $result = '';
+    if ($choice == 1) {
+        $result = $this->enigma->encrypt($text);
+        echo "\nШифрование выполнено с текущих позиций!\n";
+        echo "Позиции сохранены для расшифровки: " . $this->enigma->getLastEncryptionPositions() . "\n";
+    } else if ($choice == 2) {
+        $this->enigma->resetToInitialPositions();
+        $result = $this->enigma->encrypt($text);
+        echo "\nШифрование выполнено с начальных позиций!\n";
+        echo "Позиции сохранены для расшифровки: " . $this->enigma->getLastEncryptionPositions() . "\n";
+    } else if ($choice == 3) {
+        $this->enigma->resetToLastEncryptionPositions();
+        $result = $this->enigma->decrypt($text);
+        echo "\nДешифрование выполнено с позиций последнего шифрования!\n";
+        echo "Использованы позиции: " . $this->enigma->getLastEncryptionPositions() . "\n";
+    } else if ($choice == 4) {
+        $this->enigma->resetToInitialPositions();
+        $result = $this->enigma->decryptWithInitialPositions($text);
+        echo "\nДешифрование выполнено с начальных позиций!\n";
+        echo "Использованы позиции: " . $this->enigma->getInitialRotorPositions() . "\n";
+    } else if ($choice == 5) {
+        $this->enigma->saveCurrentPositionsAsInitial();
+        echo "\nТекущие позиции сохранены как начальные: " . $this->enigma->getInitialRotorPositions() . "\n";
         
-        echo "Текущие позиции роторов: " . $this->enigma->getRotorPositions() . "\n";
-        echo "Начальные позиции роторов: " . $this->enigma->getInitialRotorPositions() . "\n\n";
-        
-        echo "Введите текст для обработки (только буквы A-Z):\n";
-        $text = trim(fgets(STDIN));
-        
-        if (empty($text)) {
-            echo "Текст не может быть пустым!\n";
-            echo "\nНажмите Enter для продолжения...";
-            fgets(STDIN);
-            return;
-        }
-        
-        echo "\nВыберите действие:\n";
-        echo "1. Зашифровать\n";
-        echo "2. Расшифровать\n";
-        echo "3. Установить текущие позиции как начальные\n";
-        echo "Выбор (1-3): ";
-        
-        $choice = intval(trim(fgets(STDIN)));
-        
-        $result = '';
-        if ($choice == 1) {
-            $this->enigma->saveCurrentPositionsAsInitial();
-            echo "\nНачальные позиции сохранены: " . $this->enigma->getInitialRotorPositions() . "\n";
-            echo "ВАЖНО: Запомните эти позиции для расшифровки!\n\n";
-            $result = $this->enigma->encrypt($text);
-            
-            $this->enigma->saveSettings();
-        } else if ($choice == 2) {
-            $this->enigma->resetToInitialPositions();
-            echo "\nПозиции сброшены к начальным: " . $this->enigma->getRotorPositions() . "\n";
-            $result = $this->enigma->decrypt($text);
-        } else if ($choice == 3) {
-            $this->enigma->saveCurrentPositionsAsInitial();
-            echo "\nТекущие позиции сохранены как начальные: " . $this->enigma->getInitialRotorPositions() . "\n";
-            
-            $this->enigma->saveSettings();
-            
-            echo "\nНажмите Enter для продолжения...";
-            fgets(STDIN);
-            return;
-        } else {
-            echo "Неверный выбор!\n";
-            echo "\nНажмите Enter для продолжения...";
-            fgets(STDIN);
-            return;
-        }
-        
-        echo "\n==================================================\n";
-        echo "РЕЗУЛЬТАТ:\n";
-        echo "==================================================\n";
-        echo "Исходный текст: $text\n";
-        echo "Обработанный текст: $result\n";
-        
-        $grouped = '';
-        for ($i = 0; $i < strlen($result); $i++) {
-            $grouped .= $result[$i];
-            if (($i + 1) % 5 == 0 && ($i + 1) < strlen($result)) {
-                $grouped .= ' ';
-            }
-        }
-        echo "Группированный: $grouped\n";
-        
-        if ($choice == 1) {
-            echo "Начальные позиции для расшифровки: " . $this->enigma->getInitialRotorPositions() . "\n";
-        }
-        echo "==================================================\n";
+        $this->enigma->saveSettings();
         
         echo "\nНажмите Enter для продолжения...";
         fgets(STDIN);
+        return;
+    } else if ($choice == 6) {
+        $this->enigma->saveCurrentPositionsAsLastEncryption();
+        echo "\nТекущие позиции сохранены как позиции шифрования: " . $this->enigma->getLastEncryptionPositions() . "\n";
+        
+        $this->enigma->saveSettings();
+        
+        echo "\nНажмите Enter для продолжения...";
+        fgets(STDIN);
+        return;
+    } else {
+        echo "Неверный выбор!\n";
+        echo "\nНажмите Enter для продолжения...";
+        fgets(STDIN);
+        return;
     }
+    
+    echo "\n==================================================\n";
+    echo "РЕЗУЛЬТАТ:\n";
+    echo "==================================================\n";
+    echo "Исходный текст: $text\n";
+    echo "Обработанный текст: $result\n";
+    
+    $grouped = '';
+    for ($i = 0; $i < strlen($result); $i++) {
+        $grouped .= $result[$i];
+        if (($i + 1) % 5 == 0 && ($i + 1) < strlen($result)) {
+            $grouped .= ' ';
+        }
+    }
+    echo "Группированный: $grouped\n";
+    echo "Текущие позиции роторов: " . $this->enigma->getRotorPositions() . "\n";
+    echo "Позиции для расшифровки: " . $this->enigma->getLastEncryptionPositions() . "\n";
+    echo "==================================================\n";
+    
+    echo "\nНажмите Enter для продолжения...";
+    fgets(STDIN);
+}
     
     public function showCurrentSettings() {
         system('cls');
