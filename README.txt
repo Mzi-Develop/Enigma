@@ -1,35 +1,33 @@
-ОПИСАНИЕ:
-Этот симулятор воспроизводит работу знаменитой шифровальной
-машины Энигма, использовавшейся Германией во время Второй
-мировой войны.
+DESCRIPTION:
+This simulator reproduces the operation of the famous Enigma
+cipher machine used by Germany during the Second World War.
 
-ТРЕБОВАНИЯ:
-- Windows с установленным PHP 7.0 или выше
-- PHP должен быть добавлен в PATH
+REQUIREMENTS:
+- Windows with PHP 7.0 or higher installed
+- PHP must be added to the PATH
 
-ИНСТРУКЦИЯ ПО ЗАПУСКУ:
-1. Распакуйте все файлы в одну папку
-2. Запустите файл enigma.bat двойным кликом
+STARTING INSTRUCTIONS:
+1. Unpack all files into one folder
+2. Run the enigma.bat file by double-clicking it
 
-УПРАВЛЕНИЕ:
-- Используйте цифровую клавиатуру для выбора пунктов меню
-- Следуйте инструкциям на экране
+CONTROLS:
+- Use the numeric keypad to select menu items
+- Follow the on-screen instructions
 
-ДОСТУПНЫЕ ВЕРСИИ ЭНИГМЫ:
-1. Enigma I      - Стандартная версия Вермахта (1930)
-2. Enigma M3     - Стандартная версия Люфтваффе (1938)
-3. Enigma M4     - Стандартная версия Кригсмарине (1942)
-4. Enigma T      - Редкая модификация М4 - Тирпиц (1942)
+AVAILABLE ENIGMA VERSIONS:
+1. Enigma I - Standard Wehrmacht version (1930)
+2. Enigma M3 - Standard Luftwaffe version (1938)
+3. Enigma M4 - Standard Kriegsmarine version (1942)
+4. Enigma T - Rare M4 modification - Tirpitz (1942)
 
-ОСОБЕННОСТИ РЕАЛИЗАЦИИ:
-- Реализованы все основные компоненты настоящей Энигмы
-- Правильная работа роторов с точками оборота
-- Коммутационная панель - Steckerbrett
-- Разные рефлекторы для каждой версии
-- Исторически точные таблицы проводки
+FEATURES OF THE IMPLEMENTATION:
+- All the main components of the real Enigma are implemented
+- Correct operation of rotors with turning points
+- Steckerbrett switch panel
+- Different reflectors for each version
+- Historically accurate wiring tables
+NOTE:
+ This is a simplified version of the Enigma, a more realistic version
 
-ПРИМЕЧАНИЕ:
-Это упрощенная версия Энигмы, более реалистичная версия появится позже.
-
-АВТОР: Mzi-Develop
-ВЕРСИЯ: 1.0
+AUTHOR: Mzi-Develop
+VERSION: 1.0
